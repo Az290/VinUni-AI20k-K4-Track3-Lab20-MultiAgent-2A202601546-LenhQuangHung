@@ -115,3 +115,28 @@ Mỗi nhóm trả lời 2 câu:
 
 1. Case nào nên dùng multi-agent? Vì sao?
 2. Case nào không nên dùng multi-agent? Vì sao?
+
+### Trả lời
+
+**1. Case nào nên dùng multi-agent?**
+
+Khi task có thể tách thành các sub-task đòi hỏi *loại năng lực khác nhau* mà nhồi chung vào
+một prompt sẽ làm loãng context — ví dụ đúng như lab này: tìm nguồn (breadth, recall) vs.
+phản biện độ tin cậy (critical reading, phát hiện mâu thuẫn/nguồn synthetic) vs. viết văn bản
+mạch lạc có citation (structure, tone cho đúng audience). Trong benchmark thực đo được (xem
+`reports/benchmark_report.md`), multi-agent cho citation coverage ổn định gần 100% vì Analyst
+có bước riêng để đối chiếu claim với nguồn trước khi Writer viết — baseline một lượt dễ bỏ sót
+bước này khi phải làm mọi thứ cùng lúc. Multi-agent cũng đáng dùng khi cần **khả năng debug
+theo từng bước** (trace rõ ai làm gì, sai ở agent nào) — quan trọng trong môi trường production
+nơi một câu trả lời sai cần truy ngược được nguồn gốc lỗi, thay vì chỉ có một lệnh gọi LLM hộp đen.
+
+**2. Case nào không nên dùng multi-agent?**
+
+Khi câu hỏi đơn giản, không cần nhiều bước xác minh, hoặc khi latency/cost là ràng buộc cứng
+(ví dụ chatbot trả lời thời gian thực). Multi-agent trong lab này tốn nhiều lệnh gọi LLM hơn
+hẳn (Researcher + Analyst + Writer + routing overhead so với 1 lệnh gọi baseline), nên latency
+và cost luôn cao hơn — số liệu cụ thể nằm trong bảng so sánh của benchmark report. Nếu câu hỏi
+không có nhiều nguồn mâu thuẫn cần phản biện (ví dụ định nghĩa một thuật ngữ, tóm tắt một tài
+liệu duy nhất), bước Analyst gần như không thêm giá trị mà vẫn cộng thêm một lượt LLM — lúc đó
+single-agent baseline vừa rẻ vừa nhanh hơn mà chất lượng không thua kém đáng kể. Quy tắc chung
+áp dụng đúng như `README.md` đã nêu: "Không thêm agent nếu không có lý do rõ ràng."

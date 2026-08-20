@@ -10,4 +10,6 @@ build/
 *.egg-info/
 reports/*.json
 reports/*.md
+reports/traces/
 !.gitkeep
+!reports/benchmark_report.md
